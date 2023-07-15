@@ -1,6 +1,5 @@
 package ru.leonidm.bukkitinfabric.mixin;
 
-import net.fabricmc.loader.impl.util.UrlUtil;
 import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
@@ -34,21 +33,20 @@ public class CraftServerMixin {
     @Inject(method = "loadPlugins", at = @At("TAIL"), remap = false)
     private void loadPlugins(CallbackInfo ci) {
         for (var pair : BukkitInFabricM.getPluginsToLoad()) {
-            Class<?> modInitializerClass = pair.getFirst();
             PluginDescriptionFile description = pair.getSecond();
 
             if (pluginManager.isPluginEnabled(description.getName())) {
                 continue;
             }
 
-            Path jarPath = UrlUtil.getCodeSource(modInitializerClass);
+            Path jarPath = pair.getFirst();
             Path dataPath = jarPath.getParent().resolve(description.getName() + "/");
 
             try {
                 Files.createDirectories(dataPath);
 
                 String mainClassName = description.getMain();
-                Class<?> mainClass = Class.forName(mainClassName, true, modInitializerClass.getClassLoader());
+                Class<?> mainClass = Class.forName(mainClassName, true, BukkitInFabricM.class.getClassLoader());
 
                 if (!FabricBukkitPlugin.class.isAssignableFrom(mainClass)) {
                     LOGGER.error("Plugin class {} does not implement {} interface, did not load it",

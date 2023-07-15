@@ -6,7 +6,7 @@ plugins {
 
 def bifGroupId = 'ru.leonidm'
 def bifArtifactId = 'BukkitInFabricM'
-def bifVersion = '0.0.1'
+def bifVersion = '0.0.2'
 
 group bifGroupId
 version bifVersion
