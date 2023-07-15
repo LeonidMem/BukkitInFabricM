@@ -1,0 +1,24 @@
+{
+    "schemaVersion": 1,
+    "id": "bukkitinfabricm",
+    "version": "${version}",
+    "name": "bukkitinfabricm",
+    "description": "",
+    "authors": [],
+    "contact": {},
+    "license": "MIT",
+    "icon": "assets/bukkitinfabricm/icon.png",
+    "environment": "server",
+    "entrypoints": {
+        "main": [
+            "ru.leonidm.bukkitinfabric.BukkitInFabricM"
+        ]
+    },
+    "mixins": [
+        "bukkitinfabricm.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=0.14.14",
+        "minecraft": "1.19.2"
+    }
+}

@@ -1,0 +1,164 @@
+plugins {
+    id 'java-library'
+    id 'net.tetratau.tokimak.userdev' version '0.1.1-SNAPSHOT'
+    id 'maven-publish'
+}
+
+def bifGroupId = 'ru.leonidm'
+def bifArtifactId = 'BukkitInFabricM'
+def bifVersion = '0.0.1'
+
+group bifGroupId
+version bifVersion
+
+sourceCompatibility = 17
+targetCompatibility = 17
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+tasks.withType(Javadoc) { options.encoding = 'UTF-8' }
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+
+    maven {
+        name = "tetratau"
+        url = "https://mvn.tetratau.net/releases/"
+    }
+
+    maven {
+        name = 'Fabric'
+        url = 'https://maven.fabricmc.net/'
+    }
+
+    maven { url = uri("https://papermc.io/repo/repository/maven-public/") }
+    maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
+    maven { url = uri("https://oss.sonatype.org/content/groups/public/") }
+
+    maven {
+        url = 'http://nexus.hc.to/content/repositories/pub_releases'
+        allowInsecureProtocol = true
+    }
+
+    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+}
+
+configurations {
+    extraLibs
+}
+
+dependencies {
+    implementation 'org.jetbrains:annotations:22.0.0'
+
+    paperweight.paperDevBundle("1.19.2-R0.1-SNAPSHOT")
+    implementation "net.fabricmc:fabric-loader:0.14.14"
+
+    implementation "net.fabricmc:sponge-mixin:0.10.0+mixin.0.8.4.snapshot"
+
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+}
+
+buildDir = new File(rootProject.projectDir, "build/")
+jar {
+    from {
+        configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+assemble {
+    dependsOn reobfJar
+}
+
+// ./gradlew build -PjarOut=/foo/bar -PjarName=foo.jar
+build {
+    if (project.hasProperty("jarOut")) {
+        var jarOutput = project.properties["jarOut"] as String
+        println "Jar output: $jarOutput"
+        tasks.jar.destinationDirectory.set(file(jarOutput))
+    }
+    if (project.hasProperty("jarName")) {
+        var a = project.properties["jarName"] as String
+        println "Jar name: $a"
+        tasks.jar.archiveFileName.set(a)
+    }
+}
+
+processResources {
+    inputs.property "version", project.version
+    filteringCharset "UTF-8"
+
+    filesMatching("toki.mod.json") {
+        expand "version": project.version
+    }
+}
+
+def targetJavaVersion = 17
+tasks.withType(JavaCompile).configureEach {
+    // ensure that the encoding is set to UTF-8, no matter what the system default is
+    // this fixes some edge cases with special characters not displaying correctly
+    // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
+    // If Javadoc is generated, this must be specified in that task too.
+    it.options.encoding = "UTF-8"
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        it.options.release = targetJavaVersion
+    }
+}
+
+javadoc {
+    source = sourceSets.main.allJava
+    classpath = configurations.compileClasspath
+    options {
+        setMemberLevel JavadocMemberLevel.PUBLIC
+        setAuthor true
+
+        links "https://docs.oracle.com/javase/8/docs/api/"
+    }
+}
+
+task sourceJar(type: Jar) {
+    archiveClassifier.set("sources")
+    from sourceSets.main.allJava
+}
+
+task packageJavadoc(type: Jar) {
+    archiveClassifier.set("javadoc")
+    from javadoc
+}
+
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+    archivesBaseName = "bukkitinfabricm"
+    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+    // if it is present.
+    // If you remove this line, sources will not be generated.
+    withSourcesJar()
+}
+
+// configure the maven publication
+publishing {
+    publications {
+        library(MavenPublication) {
+            groupId = bifGroupId
+            artifactId = bifArtifactId
+            version = bifVersion
+
+            artifact sourceJar
+            artifact packageJavadoc
+        }
+    }
+    repositories {
+        maven {
+            name = "smashUpRepository"
+            url "https://mvn.smashup.ru/releases"
+            credentials(PasswordCredentials)
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
+    }
+}
