@@ -6,7 +6,7 @@ plugins {
 
 def bifGroupId = 'ru.leonidm'
 def bifArtifactId = 'BukkitInFabricM'
-def bifVersion = '0.0.2'
+def bifVersion = '0.0.3'
 
 group bifGroupId
 version bifVersion
@@ -52,7 +52,7 @@ dependencies {
     implementation 'org.jetbrains:annotations:22.0.0'
 
     paperweight.paperDevBundle("1.19.2-R0.1-SNAPSHOT")
-    implementation "net.fabricmc:fabric-loader:0.14.14"
+    implementation "net.fabricmc:fabric-loader:0.11.0"
 
     implementation "net.fabricmc:sponge-mixin:0.10.0+mixin.0.8.4.snapshot"
 
