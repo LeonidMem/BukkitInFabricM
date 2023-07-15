@@ -1,6 +1,5 @@
 package ru.leonidm.bukkitinfabric.mixin;
 
-import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.SimplePluginManager;
@@ -9,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -21,7 +21,22 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-@Mixin(CraftServer.class)
+@Mixin(targets = {
+        "org.bukkit.craftbukkit.v1_14_R1.CraftServer",
+        "org.bukkit.craftbukkit.v1_15_R1.CraftServer",
+        "org.bukkit.craftbukkit.v1_16_R1.CraftServer",
+        "org.bukkit.craftbukkit.v1_16_R2.CraftServer",
+        "org.bukkit.craftbukkit.v1_16_R3.CraftServer",
+        "org.bukkit.craftbukkit.v1_17_R1.CraftServer",
+        "org.bukkit.craftbukkit.v1_17_R2.CraftServer",
+        "org.bukkit.craftbukkit.v1_18_R2.CraftServer",
+        "org.bukkit.craftbukkit.v1_18_R2.CraftServer",
+        "org.bukkit.craftbukkit.v1_19_R1.CraftServer",
+        "org.bukkit.craftbukkit.v1_19_R2.CraftServer",
+        "org.bukkit.craftbukkit.v1_19_R3.CraftServer",
+        "org.bukkit.craftbukkit.V1_20_R1.CraftServer",
+}, remap = false)
+@Pseudo
 public class CraftServerMixin {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("BukkitInFabricM");
