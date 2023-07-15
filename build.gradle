@@ -147,7 +147,7 @@ publishing {
             artifactId = bifArtifactId
             version = bifVersion
 
-            artifact sourceJar
+            from components.java
             artifact packageJavadoc
         }
     }
