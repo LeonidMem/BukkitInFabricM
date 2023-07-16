@@ -14,7 +14,7 @@ like **Purple**, **Pufferfish**, etc. and also any Minecraft versions
 _My other repositories:_
 
 * [**FastNBT**](https://github.com/LeonidMem/FastNBT) — as fast as possible Bukkit library to work with NBT.
-* [**ORMM**](https://github.com/LeonidMem/ORMM) — light-weight ORMM to work with SQLite and MySQL.
+* [**ORMM**](https://github.com/LeonidMem/ORMM) — light-weight ORM library to work with SQLite and MySQL.
 
 ## Supported versions:
 * All `1.14+` versions should work fine with this mod
@@ -27,13 +27,13 @@ repositories {
 }
 
 dependencies {
-  implementation 'ru.leonidm:BukkitInFabricM:0.1.0'
+  implementation 'ru.leonidm:BukkitInFabricM:0.1.1'
 }
 ```
 
 ## Usage
 1. Import this mod in `build.gradle` and add it in `mods` directory of your server.
-2. Update `depends` in `mod.json` like `{"depends":{"bukkitinfabricm":">=0.1.0}}`.
+2. Update `depends` in `mod.json` like `{"depends":{"bukkitinfabricm":">=0.1.1}}`.
 3. Create main class for the plugin that should extend `JavaPlugin` class just like in Bukkit.
 4. Create `plugin.yml` that must be included in the output JAR just like in Bukkit.
 5. ???

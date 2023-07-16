@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.leonidm.bukkitinfabric.BukkitInFabricM;
-import ru.leonidm.bukkitinfabric.interfaces.InitializablePlugin;
+import ru.leonidm.bukkitinfabric.interfaces.ExtendedPlugin;
 
 import java.util.logging.Level;
 
@@ -37,10 +37,10 @@ public abstract class JavaPluginLoaderMixin {
             }
 
             plugin.getLogger().info(enableMsg);
-            InitializablePlugin jPlugin = (InitializablePlugin) plugin;
+            ExtendedPlugin jPlugin = (ExtendedPlugin) plugin;
 
             try {
-                jPlugin.ip$setEnabled(true);
+                jPlugin.bifm$setEnabled(true);
             } catch (Throwable var6) {
                 server.getLogger().log(Level.SEVERE, "Error occurred while enabling " + plugin.getDescription().getFullName() + " (Is it up to date?)", var6);
                 server.getPluginManager().disablePlugin(jPlugin);

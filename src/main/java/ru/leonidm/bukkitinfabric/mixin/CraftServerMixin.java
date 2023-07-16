@@ -3,8 +3,6 @@ package ru.leonidm.bukkitinfabric.mixin;
 import com.mojang.datafixers.util.Pair;
 import org.bukkit.plugin.SimplePluginManager;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
@@ -35,8 +33,6 @@ import java.util.List;
 }, remap = false)
 @Pseudo
 public abstract class CraftServerMixin {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger("BukkitInFabricM");
 
     @Shadow(remap = false)
     @Final

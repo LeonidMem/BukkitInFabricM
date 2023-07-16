@@ -4,11 +4,14 @@ import com.mojang.datafixers.util.Pair;
 import lombok.SneakyThrows;
 import net.fabricmc.api.ModInitializer;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.java.PluginClassLoader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.leonidm.bukkitinfabric.interfaces.ExtendedPluginClassLoader;
+import ru.leonidm.bukkitinfabric.utils.OpenUnsafe;
 
 import java.io.File;
 import java.io.InputStream;
@@ -30,6 +33,17 @@ public class BukkitInFabricM implements ModInitializer {
     private static final List<Pair<Path, PluginDescriptionFile>> PLUGINS_TO_LOAD = new ArrayList<>();
     private static final Set<String> PLUGIN_CLASSES = new HashSet<>();
     private static final Map<File, PluginDescriptionFile> FILES_TO_DESCRIPTIONS = new HashMap<>();
+    private static final PluginClassLoader DUMMY_CLASS_LOADER;
+
+    static {
+        try {
+            DUMMY_CLASS_LOADER = (PluginClassLoader) OpenUnsafe.get().allocateInstance(PluginClassLoader.class);
+
+            ((ExtendedPluginClassLoader) (ClassLoader) DUMMY_CLASS_LOADER).bifm$setDummy(true);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
     private final Logger logger = LoggerFactory.getLogger(BukkitInFabricM.class.getSimpleName());
 
@@ -85,5 +99,10 @@ public class BukkitInFabricM implements ModInitializer {
     @Nullable
     public static PluginDescriptionFile getPluginDescription(@NotNull File file) {
         return FILES_TO_DESCRIPTIONS.get(file);
+    }
+
+    @NotNull
+    public static PluginClassLoader getDummyClassLoader() {
+        return DUMMY_CLASS_LOADER;
     }
 }
