@@ -32,7 +32,7 @@ dependencies {
 ```
 
 ## Usage
-1. Import this mod in `build.gradle` and add it in `mods` directory.
+1. Import this mod in `build.gradle` and add it in `mods` directory of your server.
 2. Update `depends` in `mod.json` like `{"depends":{"bukkitinfabricm":">=0.1.0}}`.
 3. Create main class for the plugin that should extend `JavaPlugin` class just like in Bukkit.
 4. Create `plugin.yml` that must be included in the output JAR just like in Bukkit.
