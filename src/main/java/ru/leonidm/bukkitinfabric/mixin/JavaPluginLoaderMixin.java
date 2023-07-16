@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import ru.leonidm.bukkitinfabric.bukkit.FabricBukkitPlugin;
+import ru.leonidm.bukkitinfabric.BukkitInFabricM;
 import ru.leonidm.bukkitinfabric.interfaces.InitializablePlugin;
 
 import java.util.logging.Level;
@@ -24,7 +24,7 @@ public abstract class JavaPluginLoaderMixin {
 
     @Inject(method = "enablePlugin", at = @At("HEAD"), cancellable = true, remap = false)
     private void enablePlugin(Plugin plugin, CallbackInfo ci) {
-        if (!(plugin instanceof FabricBukkitPlugin)) {
+        if (!BukkitInFabricM.isFabricPlugin(plugin.getClass())) {
             return;
         }
 

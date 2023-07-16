@@ -1,7 +1,6 @@
 package ru.leonidm.bukkitinfabric.mixin;
 
-import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.plugin.PluginManager;
+import com.mojang.datafixers.util.Pair;
 import org.bukkit.plugin.SimplePluginManager;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -11,15 +10,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import ru.leonidm.bukkitinfabric.BukkitInFabricM;
-import ru.leonidm.bukkitinfabric.bukkit.FabricBukkitPlugin;
-import ru.leonidm.bukkitinfabric.interfaces.ExtendedPluginManager;
 
-import java.io.IOException;
-import java.nio.file.Files;
+import java.io.File;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 @Mixin(targets = {
         "org.bukkit.craftbukkit.v1_14_R1.CraftServer",
@@ -37,7 +34,7 @@ import java.nio.file.Path;
         "org.bukkit.craftbukkit.V1_20_R1.CraftServer",
 }, remap = false)
 @Pseudo
-public class CraftServerMixin {
+public abstract class CraftServerMixin {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("BukkitInFabricM");
 
@@ -45,53 +42,24 @@ public class CraftServerMixin {
     @Final
     private SimplePluginManager pluginManager;
 
-    @Inject(method = "loadPlugins", at = @At("TAIL"), remap = false)
-    private void loadPlugins(CallbackInfo ci) {
-        for (var pair : BukkitInFabricM.getPluginsToLoad()) {
-            PluginDescriptionFile description = pair.getSecond();
+    private boolean loadedFabricPlugins = false;
 
-            if (pluginManager.isPluginEnabled(description.getName())) {
-                continue;
-            }
-
-            Path jarPath = pair.getFirst();
-            Path dataPath = jarPath.getParent().resolve(description.getName() + "/");
-
-            try {
-                Files.createDirectories(dataPath);
-
-                String mainClassName = description.getMain();
-                Class<?> mainClass = Class.forName(mainClassName, true, BukkitInFabricM.class.getClassLoader());
-
-                if (!FabricBukkitPlugin.class.isAssignableFrom(mainClass)) {
-                    LOGGER.error("Plugin class {} does not implement {} interface, did not load it",
-                            mainClassName, FabricBukkitPlugin.class.getSimpleName());
-                    continue;
-                }
-
-                saveEmptyJar(dataPath);
-
-                ((ExtendedPluginManager) (PluginManager) pluginManager).loadPlugin(mainClass.asSubclass(FabricBukkitPlugin.class),
-                        description, dataPath.toFile(), jarPath.toFile());
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
-            }
+    @ModifyArg(method = "loadPlugins", at = @At(value = "INVOKE", target = "Lorg/bukkit/plugin/SimplePluginManager;loadPlugins(Ljava/io/File;Ljava/util/List;)[Lorg/bukkit/plugin/Plugin;"),
+            index = 1, remap = false)
+    @NotNull
+    private List<File> loadPluginsHead(@NotNull List<File> extraPluginJars) {
+        if (loadedFabricPlugins) {
+            return extraPluginJars;
         }
-    }
 
-    private void saveEmptyJar(@NotNull Path path) {
-        byte[] bytes = new byte[22];
-        bytes[0] = 0x50;
-        bytes[1] = 0x4B;
-        bytes[2] = 0x05;
-        bytes[3] = 0x06;
+        loadedFabricPlugins = true;
 
-        try {
-            if (!Files.exists(path)) {
-                Files.write(path, bytes);
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
+        extraPluginJars = new ArrayList<>(extraPluginJars);
+        BukkitInFabricM.getPluginsToLoad()
+                .stream()
+                .map(Pair::getFirst)
+                .map(Path::toFile)
+                .forEach(extraPluginJars::add);
+        return extraPluginJars;
     }
 }

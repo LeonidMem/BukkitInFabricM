@@ -14,5 +14,5 @@
     "injectors": {
         "defaultRequire": 1
     },
-    "refmap": "bukkitinfabricm-refmap.json"
+    "refmap": "BukkitInFabricM-refmap.json"
 }

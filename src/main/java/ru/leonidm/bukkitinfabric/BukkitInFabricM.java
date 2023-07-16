@@ -5,23 +5,31 @@ import lombok.SneakyThrows;
 import net.fabricmc.api.ModInitializer;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class BukkitInFabricM implements ModInitializer {
 
     private static final List<Pair<Path, PluginDescriptionFile>> PLUGINS_TO_LOAD = new ArrayList<>();
+    private static final Set<String> PLUGIN_CLASSES = new HashSet<>();
+    private static final Map<File, PluginDescriptionFile> FILES_TO_DESCRIPTIONS = new HashMap<>();
 
     private final Logger logger = LoggerFactory.getLogger(BukkitInFabricM.class.getSimpleName());
 
@@ -51,9 +59,11 @@ public class BukkitInFabricM implements ModInitializer {
                 }
 
                 try (InputStream inputStream = zipFile.getInputStream(zipEntry)) {
-                    PluginDescriptionFile pluginDescriptionFile = new PluginDescriptionFile(inputStream);
+                    PluginDescriptionFile description = new PluginDescriptionFile(inputStream);
 
-                    PLUGINS_TO_LOAD.add(Pair.of(jarPath, pluginDescriptionFile));
+                    PLUGINS_TO_LOAD.add(Pair.of(jarPath, description));
+                    PLUGIN_CLASSES.add(description.getMain());
+                    FILES_TO_DESCRIPTIONS.put(jarPath.toFile(), description);
                 }
             }
 
@@ -66,5 +76,14 @@ public class BukkitInFabricM implements ModInitializer {
     @Unmodifiable
     public static List<Pair<Path, PluginDescriptionFile>> getPluginsToLoad() {
         return Collections.unmodifiableList(PLUGINS_TO_LOAD);
+    }
+
+    public static boolean isFabricPlugin(@NotNull Class<?> pluginClass) {
+        return PLUGIN_CLASSES.contains(pluginClass.getName());
+    }
+
+    @Nullable
+    public static PluginDescriptionFile getPluginDescription(@NotNull File file) {
+        return FILES_TO_DESCRIPTIONS.get(file);
     }
 }
