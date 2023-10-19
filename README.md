@@ -17,7 +17,8 @@ _My other repositories:_
 * [**ORMM**](https://github.com/LeonidMem/ORMM) — light-weight ORM library to work with SQLite and MySQL.
 
 ## Supported versions:
-* All `1.14+` versions should work fine with this mod
+* `1.14 — 1.19.4` requires `BukkitInFabricM 0.1.1`
+* `1.20+` requires `BukkitInFabricM 0.1.2`
 * But Fabric loader `>= 0.11.0`
 
 ## Importing
@@ -27,13 +28,13 @@ repositories {
 }
 
 dependencies {
-  implementation 'ru.leonidm:BukkitInFabricM:0.1.1'
+  implementation 'ru.leonidm:BukkitInFabricM:0.1.2'
 }
 ```
 
 ## Usage
 1. Import this mod in `build.gradle` and add it in `mods` directory of your server.
-2. Update `depends` in `mod.json` like `{"depends":{"bukkitinfabricm":">=0.1.1}}`.
+2. Update `depends` in `mod.json` like `{"depends":{"bukkitinfabricm":">=0.1.2"}}`.
 3. Create main class for the plugin that should extend `JavaPlugin` class just like in Bukkit.
 4. Create `plugin.yml` that must be included in the output JAR just like in Bukkit.
 5. ???

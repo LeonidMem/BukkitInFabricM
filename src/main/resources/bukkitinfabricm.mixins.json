@@ -4,11 +4,11 @@
     "package": "ru.leonidm.bukkitinfabric.mixin",
     "compatibilityLevel": "JAVA_17",
     "mixins": [
-        "CraftServerMixin",
         "JavaPluginLoaderMixin",
         "JavaPluginMixin",
         "PluginClassLoaderMixin",
-        "SimplePluginManagerMixin"
+        "SimplePluginManagerMixin",
+        "SimpleProviderStorageMixin"
     ],
     "client": [
     ],
